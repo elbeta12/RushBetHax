@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Liga Rushbet 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+<!-- ⚠️  config.js está en .gitignore — contiene las credenciales Firebase -->
+<script src="config.js"></script>
+
+<!-- Estilos -->
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div id="toast"></div>
+<div id="lightbox" onclick="this.classList.remove('open')"><img id="lb-img" src="" alt=""></div>
+
+<!-- PLAYER PROFILE MODAL -->
+<div class="pmodal-overlay" id="pmodal" onclick="if(event.target===this)closePModal()">
+  <div class="pmodal">
+    <div class="pmodal-banner"><div class="pmodal-banner-text">RB</div></div>
+    <button class="pmodal-close" onclick="closePModal()">&#10005;</button>
+    <div class="pmodal-body" id="pmodalBody"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div>
+  </div>
+</div>
+
+<!-- TEAM PROFILE MODAL -->
+<div class="tmodal-overlay" id="tmodal" onclick="if(event.target===this)closeTModal()">
+  <div class="tmodal">
+    <div class="tmodal-banner"><div class="tmodal-banner-text">EQUIPO</div></div>
+    <button class="tmodal-close" onclick="closeTModal()">&#10005;</button>
+    <div class="tmodal-body" id="tmodalBody"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div>
+  </div>
+</div>
+
+<div class="ambient"><div class="ambient-orb orb1"></div><div class="ambient-orb orb2"></div><div class="ambient-orb orb3"></div></div>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-wrap" onclick="showSection('inicio')">
+      <div class="logo-badge">
+        <svg viewBox="0 0 30 30" fill="none"><polygon points="15,3 27,9 27,21 15,27 3,21 3,9" fill="rgba(10,16,32,0.6)" stroke="rgba(255,255,255,0.3)" stroke-width=".5"/><text x="15" y="20" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="white" letter-spacing="1">LR</text></svg>
+      </div>
+      <div class="logo-text"><div class="title"><span class="rush">RUSH</span><span class="bet">BET</span></div><div class="sub">LIGA 2026</div></div>
+    </div>
+    <div class="spacer"></div>
+    <nav class="nav" id="mainNav">
+      <div class="nav-slider" id="navSlider"></div>
+      <button class="nav-btn active" onclick="showSection('inicio',this)">Inicio</button>
+      <button class="nav-btn" onclick="showSection('tablas',this)">Tabla</button>
+      <button class="nav-btn" onclick="showSection('jornadas',this)">Jornadas</button>
+      <button class="nav-btn" onclick="showSection('stats',this)">Stats</button>
+      <button class="nav-btn" onclick="showSection('tarjetas',this)">Tarjetas</button>
+      <button class="nav-btn" onclick="showSection('equipos',this)">Equipos</button>
+      <button class="nav-btn" onclick="showSection('fichajes',this)">Fichajes</button>
+      <button class="nav-btn" onclick="showSection('foro',this)">Foro</button>
+      <button class="nav-btn" onclick="showSection('noticias',this)">Noticias</button>
+      <button class="nav-btn" onclick="showSection('reglamento',this)">Reglamento</button>
+      <button class="nav-btn" onclick="showSection('cuenta',this)" id="cuentaNavBtn">Cuenta</button>
+    </nav>
+    <a href="https://discord.gg/rushbet" target="_blank" class="discord-btn">
+      <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.5 0a40 40 0 0 0-1.8 3.6 54.1 54.1 0 0 0-16.3 0A39 39 0 0 0 25.6 0 58.3 58.3 0 0 0 11 4.9C1.6 18.8-1 32.4.3 45.8a58.9 58.9 0 0 0 18 9.1 44.8 44.8 0 0 0 3.9-6.3 38.3 38.3 0 0 1-6.1-2.9l1.5-1.1a42 42 0 0 0 35.8 0l1.5 1.1a38.2 38.2 0 0 1-6.1 2.9 44.6 44.6 0 0 0 3.8 6.3 58.7 58.7 0 0 0 18-9.1C73 30.4 69.3 16.9 60.1 4.9ZM23.7 37.4c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.1 6.4-7.1c3.5 0 6.5 3.2 6.4 7.1 0 4-2.9 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.1 6.4-7.1c3.5 0 6.4 3.2 6.4 7.1 0 4-2.9 7.1-6.4 7.1Z"/></svg>
+      DISCORD
+    </a>
+  </div>
+</header>
+
+<main class="main">
+<section class="section active" id="sec-inicio">
+  <div class="hero reveal">
+    <div class="hero-scanlines"></div><div class="hero-topline"></div>
+    <div class="hero-bg-text">RUSHBET</div>
+    <div class="hero-content">
+      <div class="live-badge"><span class="live-dot"></span>TEMPORADA 2026 ACTIVA</div>
+      <h1><span class="line1">LIGA</span><span class="line2">RUSHBET</span></h1>
+      <p class="hero-desc">La liga de futbol mas competitiva del Discord. Estadisticas en tiempo real, fichajes, torneos y mucho mas.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="hero-stat-num" id="hs-equipos">-</span><span class="hero-stat-label">Equipos</span></div>
+        <div class="hero-stat"><span class="hero-stat-num" id="hs-partidos">-</span><span class="hero-stat-label">Partidos</span></div>
+        <div class="hero-stat"><span class="hero-stat-num" id="hs-goles">-</span><span class="hero-stat-label">Goles</span></div>
+        <div class="hero-stat"><span class="hero-stat-num" id="hs-jugadores">-</span><span class="hero-stat-label">Jugadores</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec-head reveal"><h2>ULTIMAS NOTICIAS</h2><div class="sec-head-line"></div><span class="sec-tag">RECIENTES</span></div>
+  <div class="news-grid" id="homeNews"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div>
+</section>
+
+<section class="section" id="sec-tablas">
+  <div class="sec-head reveal"><h2>TABLA DE POSICIONES</h2><div class="sec-head-line"></div><span class="sec-tag">TEMPORADA 2026</span></div>
+  <div class="card reveal">
+    <div class="card-head"><h3>PRIMERA DIVISION</h3></div>
+    <div class="table-wrap" id="tabla1Wrap"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div>
+  </div>
+</section>
+
+<section class="section" id="sec-jornadas">
+  <div class="sec-head reveal"><h2>JORNADAS</h2><div class="sec-head-line"></div><span class="sec-tag">FIXTURE</span></div>
+  <div class="card reveal">
+    <div class="card-head" style="justify-content:space-between">
+      <h3>PARTIDOS</h3>
+      <span id="jornadaCountLabel" style="font-family:var(--fc);font-size:.68rem;color:var(--g3);letter-spacing:1px"></span>
+    </div>
+    <div class="jornadas-toolbar">
+      <div class="jornadas-filters" id="jornadasFilters">
+        <button class="jornada-filter-btn active" onclick="filterJornadas('all',this)">TODOS</button>
+        <button class="jornada-filter-btn" onclick="filterJornadas('played',this)">JUGADOS</button>
+        <button class="jornada-filter-btn" onclick="filterJornadas('pending',this)">PENDIENTES</button>
+      </div>
+    </div>
+    <div class="matches-grid" id="matchesGrid"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div>
+  </div>
+</section>
+
+<section class="section" id="sec-stats">
+  <div class="sec-head reveal"><h2>ESTADISTICAS</h2><div class="sec-head-line"></div><span class="sec-tag">TOP JUGADORES</span></div>
+  <div class="stats-grid reveal">
+    <div class="card"><div class="card-head"><h3>GOLEADORES</h3></div><div id="statsGoles"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div></div>
+    <div class="card"><div class="card-head"><h3>ASISTENCIAS</h3></div><div id="statsAsist"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div></div>
+    <div class="card"><div class="card-head"><h3>VALLAS INVICTAS</h3></div><div id="statsCS"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div></div>
+  </div>
+</section>
+
+<section class="section" id="sec-tarjetas">
+  <div class="sec-head reveal"><h2>TARJETAS</h2><div class="sec-head-line"></div><span class="sec-tag">DISCIPLINA</span></div>
+  <div class="card reveal"><div class="card-head"><h3>AMARILLAS</h3></div><div class="tarjetas-grid" id="tarjetasAmaril"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div></div>
+  <div class="card reveal"><div class="card-head"><h3>ROJAS</h3></div><div class="tarjetas-grid" id="tarjetasRojas"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div></div>
+  <div class="card reveal"><div class="card-head"><h3>SANCIONES</h3></div><div id="sancionesWrap"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div></div>
+</section>
+
+<section class="section" id="sec-equipos">
+  <div class="sec-head reveal"><h2>EQUIPOS</h2><div class="sec-head-line"></div><span class="sec-tag">REGISTRADOS</span></div>
+  <div id="equiposGrid" class="equipos-grid"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div>
+</section>
+
+<section class="section" id="sec-fichajes">
+  <div class="sec-head reveal"><h2>HISTORIAL DE FICHAJES</h2><div class="sec-head-line"></div><span class="sec-tag">MOVIMIENTOS</span></div>
+  <div class="card reveal"><div class="card-head"><h3>ULTIMOS MOVIMIENTOS</h3></div><div class="fichajes-list" id="fichajesList"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div></div>
+</section>
+
+<section class="section" id="sec-foro">
+  <div class="sec-head reveal"><h2>FORO</h2><div class="sec-head-line"></div><span class="sec-tag">COMUNIDAD</span></div>
+  <div id="foroComposeWrap"></div>
+  <div class="foro-posts" id="foroPosts"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div>
+</section>
+
+<section class="section" id="sec-noticias">
+  <div class="sec-head reveal"><h2>NOTICIAS</h2><div class="sec-head-line"></div><span class="sec-tag">ACTUALIDAD</span></div>
+  <div class="news-grid" id="noticiasList"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div>
+</section>
+
+<section class="section" id="sec-reglamento">
+  <div class="sec-head reveal"><h2>REGLAMENTO</h2><div class="sec-head-line"></div><span class="sec-tag">NORMAS</span></div>
+  <div class="rules-grid reveal">
+    <div class="rule-card"><div class="rule-num">01</div><div class="rule-title">INSCRIPCION</div><div class="rule-text">Todos los equipos deben estar <b>registrados en el bot</b> con un minimo de <b>8 jugadores</b> y maximo de 23. El DT es responsable de mantener la plantilla actualizada.</div></div>
+    <div class="rule-card"><div class="rule-num">02</div><div class="rule-title">PARTIDOS</div><div class="rule-text">Los partidos se programan con el comando <b>/partidos</b>. El resultado debe ser confirmado por ambos DTs. Partidos sin confirmar en <b>48 horas</b> se cancelan.</div></div>
+    <div class="rule-card"><div class="rule-num">03</div><div class="rule-title">FICHAJES</div><div class="rule-text">Cada equipo puede fichar libremente. Un jugador que renuncia tiene un <b>bloqueo de 7 dias</b> antes de poder fichar por otro equipo.</div></div>
+    <div class="rule-card"><div class="rule-num">04</div><div class="rule-title">TARJETAS</div><div class="rule-text"><b>3 amarillas</b> = 1 partido de sancion. Una <b>roja directa</b> = 1 partido de suspension. Las sanciones se aplican automaticamente.</div></div>
+    <div class="rule-card"><div class="rule-num">05</div><div class="rule-title">FAIR PLAY</div><div class="rule-text">El respeto es obligatorio. Conducta antideportiva puede resultar en <b>suspension temporal o permanente</b> del torneo. Las decisiones del admin son inapelables.</div></div>
+    <div class="rule-card"><div class="rule-num">06</div><div class="rule-title">CUENTA WEB</div><div class="rule-text">Para ver tus stats y participar en el foro debes <b>vincular tu cuenta</b> de Discord usando el comando <b>/vincular</b> en el bot.</div></div>
+  </div>
+</section>
+
+<section class="section" id="sec-cuenta">
+  <div class="sec-head reveal"><h2>MI CUENTA</h2><div class="sec-head-line"></div><span class="sec-tag">PERFIL</span></div>
+  <div id="cuentaContent"><div class="loading"><div class="spinner"></div><p>CARGANDO</p></div></div>
+</section>
+</main>
+
+<button id="adminBtn" onclick="openAdmin()" title="Admin">&#9881;</button>
+
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAdmin()">&#10005;</button>
+    <h2>PANEL ADMIN</h2>
+    <div id="adminContent">
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('primera',this)">1RA DIV</button>
+        <button class="admin-tab" onclick="switchAdminTab('partidos',this)">PARTIDOS</button>
+        <button class="admin-tab" onclick="switchAdminTab('stats',this)">STATS</button>
+        <button class="admin-tab" onclick="switchAdminTab('tarjetas',this)">TARJETAS</button>
+        <button class="admin-tab" onclick="switchAdminTab('sanciones',this)">SANCIONES</button>
+        <button class="admin-tab" onclick="switchAdminTab('noticias',this)">NOTICIAS</button>
+        <button class="admin-tab" onclick="switchAdminTab('cuentas',this)">CUENTAS</button>
+        <button class="admin-tab" onclick="switchAdminTab('anuncios',this)">ANUNCIOS</button>
+        <button class="admin-tab" id="adminTabSuperadmin" onclick="switchAdminTab('superadmin',this)" style="display:none;background:rgba(240,180,41,.12);border-color:rgba(240,180,41,.4);color:var(--gold)">SUPERADMIN</button>
+      </div>
+      <div id="adminPanels"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo"><span class="rush">RUSH</span><span class="bet">BET</span></div>
+  <p class="footer-copy">2026 Liga Rushbet - Todos los derechos reservados</p>
+  <div class="footer-links">
+    <a href="#" onclick="showSection('reglamento');return false">Reglamento</a>
+    <a href="https://discord.gg/tmNVdxUPr4" target="_blank">Discord</a>
+    <a href="#" onclick="showSection('cuenta');return false">Mi Cuenta</a>
+  </div>
+</footer>
+
+<!-- Lógica de la app -->
+<script src="app.js"></script>
+</body>
+</html>
